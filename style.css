@@ -1,0 +1,600 @@
+/* =========================
+   1. 폰트 & 기본 설정
+========================= */
+@font-face {
+  font-family: 'TitleFont';
+  src: url('fonts/DNFBitBitv2.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'BodyFont';
+  src: url('fonts/Galmuri11.ttf') format('truetype');
+}
+
+body {
+  margin: 0;
+  font-family: 'BodyFont', sans-serif;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+h2, h3, #topText {
+  font-family: 'TitleFont', sans-serif;
+}
+
+input, textarea {
+  font-family: inherit;
+}
+
+/* =========================
+   2. 전체 레이아웃
+========================= */
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+.left, .right {
+  width: 25%;
+  background: #f0f0f0;
+  padding: 10px 18px 18px 18px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+.center {
+  width: 50%;
+  text-align: center;
+  padding: 10px 0 30px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* 좌우 헤더 */
+.side-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px;
+}
+
+.side-header h3 {
+  margin: 0;
+}
+
+.side-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0px;
+  transform: translateY(-3px);
+}
+
+/* =========================
+   3. 날짜, 시간, 타이틀
+========================= */
+#dateTimeBox {
+  margin-top: 16px;
+  margin-bottom: 14px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+#todayDate {
+  font-size: 14px;
+  color: #666;
+  align-items: center;
+}
+
+#currentTime {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#topText {
+  display: block;
+  width: 300px;
+  margin: 14px auto;
+  padding: 32px 28px 32px 28px;
+  box-sizing: border-box;
+  min-height: 0;
+  height: auto;
+  line-height: 1.2;
+  text-align: center;
+  font-size: 1.6em;
+  background: #eee;
+  border: none;
+  outline: none;
+  border-radius: 60px;
+  resize: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* =========================
+   4. 이미지 & 랜덤 텍스트
+========================= */
+.image-container {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 10px auto;
+  border: 0px solid #ccc;
+  overflow: hidden;
+  background: #fff;
+}
+
+.image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  cursor: pointer;
+  transition: object-fit 0.2s ease, transform 0.2s ease;
+}
+
+.image-container img.contain-mode {
+  object-fit: contain;
+  background: #fff;
+}
+
+.bottom-text {
+  width: 300px;
+  margin: 10px auto;
+  padding: 6px 28px 4px;
+  background: transparent;
+  box-sizing: border-box;
+  min-height: 10px;
+  position: relative;
+  text-align: center;
+}
+
+.bottom-text-content {
+  display: block;
+  min-height: 0;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.quote-mark {
+  position: absolute;
+  top: 5px;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: bold;
+  color: #555;
+  pointer-events: none;
+}
+
+.left-quote { left: 8px; }
+.right-quote { right: 8px; }
+
+.bottom-text.empty .quote-mark { display: none; }
+.bottom-text.empty {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  min-height: 6px;
+}
+
+/* =========================
+   5. 설정 팝업
+========================= */
+#settingsPanel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.3);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.panel-box {
+  background: white;
+  border-radius: 10px;
+  padding: 24px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.settings-box {
+  width: 760px;
+  max-width: calc(100vw - 40px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.panel-header span {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.settings-section {
+  margin-bottom: 22px;
+  text-align: left;
+}
+
+.section-title {
+  font-weight: bold;
+  margin: 10px 10px 10px 4px;
+}
+
+/* 썸네일 리스트 */
+.thumb-list {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-height: 110px;
+  box-sizing: border-box;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.thumb-item {
+  width: 90px;
+  height: 90px;
+  border: 2px solid transparent;
+  flex: 0 0 auto;
+  overflow: hidden;
+  background: white;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.thumb-item.selected { border: 1px solid #333; }
+.thumb-item img { width: 100%; height: 100%; object-fit: cover; }
+
+.settings-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 10px -4px 0 -4px;
+}
+
+/* 문장 리스트 */
+.dialogue-list {
+  border: 1px solid #ccc;
+  padding: 10px;
+  min-height: 90px;
+  max-height: 140px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.dialogue-chip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 16px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  margin-top: 5px;
+  margin-bottom: 8px;
+  background: white;
+}
+
+.dialogue-chip:last-child { margin-bottom: 0; }
+.dialogue-text { flex: 1; white-space: pre-wrap; word-break: break-word; }
+
+.dialogue-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  align-items: center;
+}
+
+#dialogueInput {
+  flex: 1;
+  border: 1px solid #555;
+  padding: 8px 16px 8px 16px;
+  outline: none;
+  border-radius: 8px;
+}
+
+#dialogueInput:focus {
+  flex: 1;
+  border: 1px solid #555;
+  padding: 8px 16px 8px 16px;
+  outline: none;
+  border-radius: 8px;
+}
+
+/* =========================
+   6. 타이머 & 스톱워치 박스
+========================= */
+.box {
+  width: 300px;
+  margin: 16px auto;
+  padding: 16px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 12px;
+}
+
+.box-header {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 32px;
+  margin-bottom: 6px;
+}
+
+.box-header h2 {
+  margin: 0;
+  font-size: 20px;
+  text-align: center;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* 타이머 입력 */
+#t_inputBox {
+  font-size: 20px;
+  margin: 12px 0;
+  margin-bottom: -16px;
+  user-select: none;
+}
+
+.time-part {
+  display: inline-block;
+  min-width: 40px;
+  text-align: center;
+  border-bottom: transparent;
+  padding: 2px 4px;
+  margin-top: 10px;
+}
+
+.time-part:focus {
+  outline: none;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.colon {
+  display: inline-block;
+  margin: 0 4px;
+}
+
+/* =========================
+   7. 기록 & 메모 카드
+========================= */
+#recordList, #memoList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.record-card {
+  background: white;
+  padding: 16px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+
+.record-card input {
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 6px;
+}
+
+.record-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.record-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  outline: none;
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.record-icons {
+  display: flex;
+  gap: 0px;
+  align-items: center;
+  transform: translateY(-4px);
+}
+
+.record-time {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.record-sub {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.memo {
+  position: relative;
+  padding: 12px 16px 16px 16px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  background: white;
+  border-radius: 8px;
+}
+
+.memo textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  overflow: hidden;
+  box-sizing: border-box;
+  font: inherit;
+  line-height: 1.4;
+  padding: 24px 0 0 0;
+  margin: 0 0 8px 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.memo textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* =========================
+   8. 공통 버튼 & 아이콘
+========================= */
+button {
+  margin: 5px;
+  padding: 7px 12px;
+  cursor: pointer;
+  border-radius: 16px;
+  border: none;
+  font-family: inherit;
+}
+
+/* 설정 닫기 버튼 */
+#closeSettingsPanel {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent url("icons/delete.png") no-repeat center / 24px;
+  border: none;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+}
+#closeSettingsPanel:hover { opacity: 0.6; }
+
+/* 이미지 설정 아이콘 */
+.image-settings-btn {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background-color: transparent;
+  background-image: url("icons/settings.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px 24px;
+  border-radius: 999px;
+  padding: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+.image-settings-btn:hover { opacity: 0.7; }
+
+/* 공통 아이콘 버튼 셋 */
+.icon-btn-select, .icon-btn-delete, .icon-btn-add, .icon-btn-record, 
+.icon-btn-clear-record, .icon-btn-memo-capture, .icon-btn-memo-clear, .icon-btn-memo-add {
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn-select { width: 30px; height: 30px; background-image: url("icons/file.png"); background-size: 30px 30px; }
+.icon-btn-delete { width: 24px; height: 24px; background-image: url("icons/clear.png"); background-size: 24px 24px; }
+.icon-btn-add { width: 28px; height: 28px; border: 1px solid #555; background-image: url("icons/add.png"); background-size: 16px 16px; }
+.icon-btn-record { padding: 4px; }
+.icon-btn-clear-record { width: 25px; height: 25px; background-image: url("icons/clear.png"); background-size: 25px 25px; margin-right: -4px; }
+.icon-btn-memo-capture { width: 30px; height: 30px; background-image: url("icons/capture.png"); background-size: 30px 30px; padding: 0; }
+.icon-btn-memo-clear { width: 25px; height: 25px; background-image: url("icons/clear.png"); background-size: 25px 25px; padding: 0; margin-right: -4px; }
+.icon-btn-memo-add { width: 22px; height: 22px; background-image: url("icons/add.png"); background-size: 22px 22px; padding: 0; }
+
+.icon-btn-select:hover, .icon-btn-delete:hover, .icon-btn-add:hover, .icon-btn-record:hover,
+.icon-btn-clear-record:hover, .icon-btn-memo-capture:hover, .icon-btn-memo-clear:hover, .icon-btn-memo-add:hover {
+  opacity: 0.7;
+}
+
+/* 기록/메모 내부 아이콘 */
+.record-side-icon { width: 30px; height: 30px; object-fit: contain; display: block; pointer-events: none; }
+.record-type-icon { width: 24px; height: 24px; object-fit: contain; flex: 0 0 auto; display: flex; align-items: center; justify-content: center; }
+.record-delete-icon { width: 20px; height: 20px; object-fit: contain; cursor: pointer; padding: 0px; display: flex; align-items: center; justify-content: center; }
+.record-delete-icon:hover { opacity: 0.6; }
+
+.dialogue-remove {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  background: transparent url("icons/delete.png") no-repeat center / 16px;
+  border: none;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+}
+.dialogue-remove:hover { opacity: 0.6; }
+
+.memo-delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background-color: transparent;
+  background-image: url("icons/delete.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 18px 18px;
+  cursor: pointer;
+}
+.memo-delete-btn:hover { opacity: 0.6; }
+
+/* 토글 버튼 */
+.toggle-icon-btn {
+  position: absolute;
+  right: 0;
+  top: 35%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border: none;
+  background-color: transparent;
+  background-image: url("icons/toggle.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 24px 24px;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.toggle-icon-btn:hover { opacity: 0.7; }
+.toggle-icon-btn.is-collapsed { transform: translateY(-50%) rotate(180deg); }
+
+.right-group { display: flex; gap: 0px; align-items: center; }

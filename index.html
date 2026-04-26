@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WORK TIMER</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <audio id="alarmSound" src="sounds/alarm.mp3"></audio>
+
+  <div class="container">
+
+    <div class="left">
+      <div class="side-header">
+        <h3>RECORD</h3>
+        <div class="side-buttons">
+          <button id="captureRecordBtn" type="button" class="icon-btn-record" data-html2canvas-ignore="true">
+            <img src="icons/capture.png" alt="기록 캡처" class="record-side-icon">
+          </button>
+          <button id="clearRecordBtn" type="button" class="icon-btn-clear-record" aria-label="기록 전체 삭제" data-html2canvas-ignore="true"></button>
+        </div>
+      </div>
+      <div id="recordList"></div>
+    </div>
+
+    <div class="center">
+      
+      <div id="dateTimeBox">
+        <div id="todayDate"></div>
+        <div id="currentTime"></div>
+      </div>
+
+      <textarea id="topText" rows="1">오늘의 작업</textarea>
+
+      <div class="image-container">
+        <img id="displayImage" src="" alt="이미지">
+        <button id="openSettingsPanel" type="button" class="image-settings-btn" aria-label="설정 열기"></button>
+      </div>
+
+      <div id="bottomText" class="bottom-text">
+        <span class="quote-mark left-quote">“</span>
+        <span id="bottomTextContent" class="bottom-text-content"></span>
+        <span class="quote-mark right-quote">”</span>
+      </div>
+
+      <div id="settingsPanel">
+        <div class="panel-box settings-box">
+          <div class="panel-header">
+            <button id="closeSettingsPanel"></button>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">이미지</div>
+            <div id="imageThumbList" class="thumb-list"></div>
+            <div class="settings-actions">
+              <input type="file" id="popupImageInput" multiple accept="image/*" hidden>
+              <button id="applyImageBtn">적용</button>
+              <div class="right-group">
+                <button id="selectImageBtn" class="icon-btn-select"></button>
+                <button id="removeSelectedImageBtn" class="icon-btn-delete"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <div class="section-title">랜덤 문장</div>
+            <div id="dialogueList" class="dialogue-list"></div>
+            <div class="dialogue-input-row">
+              <input type="text" id="dialogueInput" placeholder="입력한 문장들 중 하나가 2분에 한 번 무작위로 출력됩니다.">
+              <button id="addDialogueBtn" class="icon-btn-add"></button>
+            </div>
+            <div class="settings-actions">
+              <button id="applyDialogueBtn">적용</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">
+          <h2>STOPWATCH</h2>
+          <button id="sw_toggle" type="button" class="toggle-icon-btn" aria-label="스톱워치 접기/펼치기"></button>
+        </div>
+        <div id="sw_content">
+          <h1 id="sw_display">00:00</h1>
+          <div class="button-row">
+            <button id="sw_start">START</button>
+            <button id="sw_stop" style="display:none;">Pause</button>
+            <button id="sw_record" style="display:none;">Record</button>
+            <button id="sw_reset" style="display:none;">Reset</button>
+            <button id="sw_resume" style="display:none;">Continue</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="box">
+        <div class="box-header">
+          <h2>TIMER</h2>
+          <button id="t_toggle" type="button" class="toggle-icon-btn" aria-label="타이머 접기/펼치기"></button>
+        </div>
+        <div id="t_content">
+          <div id="t_inputBox">
+            <span class="time-part" contenteditable="true" id="t_h">00</span>
+            <span class="colon">:</span>
+            <span class="time-part" contenteditable="true" id="t_m">00</span>
+            <span class="colon">:</span>
+            <span class="time-part" contenteditable="true" id="t_s">00</span>
+          </div>
+          <h1 id="t_display">00:00</h1>
+          <div class="button-row">
+            <button id="t_start">START</button>
+            <button id="t_stop" style="display:none;">Pause</button>
+            <button id="t_record" style="display:none;">Record</button>
+            <button id="t_reset" style="display:none;">Reset</button>
+            <button id="t_resume" style="display:none;">Continue</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="right">
+      <div class="side-header">
+        <h3>MEMO</h3>
+        <div class="side-buttons">
+          <button id="addMemoBtn" type="button" class="icon-btn-memo-add" aria-label="메모 추가" data-html2canvas-ignore="true"></button>
+          <button id="captureMemoBtn" type="button" class="icon-btn-memo-capture" aria-label="메모 캡처" data-html2canvas-ignore="true"></button>
+          <button id="clearMemoBtn" type="button" class="icon-btn-memo-clear" aria-label="메모 전체 삭제" data-html2canvas-ignore="true"></button>
+        </div>
+      </div>
+      <div id="memoList"></div>
+    </div>
+
+  </div>
+
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
