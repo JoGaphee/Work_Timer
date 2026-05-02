@@ -422,15 +422,65 @@ function createRecord(title, time, sub, start) {
   saveAppData();
 }
 
-const memoColors = ["#ffffff", "#ffebeb", "#e4f7d9"];
+const defaultMemoColors = ["#ffffff", "#ffebeb", "#e4f7d9"];
+let memoColorSlots = [...defaultMemoColors];
+let editingMemoColorIndex = null;
 
-function createMemo(text = "", background = "#ffffff", isLoading = false) {
+function normalizeHex(value) {
+  let hex = value.trim();
+
+  if (!hex.startsWith("#")) {
+    hex = "#" + hex;
+  }
+
+  if (/^#[0-9a-fA-F]{3}$/.test(hex)) {
+    hex = "#" + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+  }
+
+  if (!/^#[0-9a-fA-F]{6}$/.test(hex)) {
+    return null;
+  }
+
+  return hex.toLowerCase();
+}
+
+function updateMemoColorButtons() {
+  document.querySelectorAll(".memo-color-btn").forEach((btn, index) => {
+    btn.style.background = memoColorSlots[index] || defaultMemoColors[index];
+  });
+}
+
+function replaceMemoColorSlot(index, newColor) {
+  memoColorSlots[index] = newColor;
+  updateMemoColorButtons();
+
+  document.querySelectorAll(".memo").forEach((memo) => {
+    if (String(memo.dataset.colorIndex) === String(index)) {
+      memo.dataset.color = newColor;
+      memo.style.background = newColor;
+    }
+  });
+
+  saveAppData();
+}
+
+function createMemo(text = "", background = null, isLoading = false, colorIndex = 0) {
   const m = document.createElement("div");
   m.className = "memo";
-  m.style.background = background;
 
-  let colorIndex = memoColors.indexOf(background);
-  if (colorIndex < 0) colorIndex = 0;
+  if (colorIndex === undefined || colorIndex === null || Number.isNaN(Number(colorIndex))) {
+    colorIndex = 0;
+  }
+
+  colorIndex = Number(colorIndex);
+
+  if (background === null) {
+    background = memoColorSlots[colorIndex] || memoColorSlots[0];
+  }
+
+  m.dataset.colorIndex = colorIndex;
+  m.dataset.color = background;
+  m.style.background = background;
 
   m.innerHTML = `
     <button class="memo-delete-btn"></button>
@@ -452,8 +502,12 @@ function createMemo(text = "", background = "#ffffff", isLoading = false) {
 
   m.onclick = (e) => {
     if (e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON") return;
-    colorIndex = (colorIndex + 1) % memoColors.length;
-    m.style.background = memoColors[colorIndex];
+
+    colorIndex = (colorIndex + 1) % memoColorSlots.length;
+    m.dataset.colorIndex = colorIndex;
+    m.dataset.color = memoColorSlots[colorIndex];
+    m.style.background = memoColorSlots[colorIndex];
+
     saveAppData();
   };
 
@@ -464,7 +518,7 @@ function createMemo(text = "", background = "#ffffff", isLoading = false) {
 
   if (isLoading) memoList.appendChild(m);
   else memoList.prepend(m);
-  
+
   resizeMemo();
 }
 
@@ -703,9 +757,10 @@ const STORAGE_KEY = "workTimerData";
 
 function saveAppData() {
   const memos = Array.from(document.querySelectorAll(".memo")).map((memo) => {
-    return {
-      text: memo.querySelector("textarea").value,
-      background: memo.style.background || "#ffffff"
+  return {
+    text: memo.querySelector("textarea").value,
+    background: memo.dataset.color || memo.style.background || "#ffffff",
+    colorIndex: parseInt(memo.dataset.colorIndex || "0", 10)
     };
   });
 
@@ -715,6 +770,9 @@ function saveAppData() {
     recordsHtml: recordList.innerHTML,
     memos,
     appliedImages,
+    memoColorSlots,
+    hasSubStopwatch,
+    hasSubTimer,
     imageContainMode: displayImage.classList.contains("contain-mode")
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -737,9 +795,18 @@ function loadAppData() {
     bindRecordEvents();
   }
 
+  if (Array.isArray(data.memoColorSlots)) {
+  memoColorSlots = data.memoColorSlots;
+
+  // 컬러칩 반영
+  document.querySelectorAll(".memo-color-btn").forEach((btn, i) => {
+    btn.style.background = memoColorSlots[i];
+  });
+  }
+
   if (Array.isArray(data.memos)) {
     memoList.innerHTML = "";
-    data.memos.forEach(item => createMemo(item.text, item.background, true));
+    data.memos.forEach(item => createMemo(item.text, item.background, true, item.colorIndex ?? 0));
   }
 
   if (Array.isArray(data.appliedImages) && data.appliedImages.length > 0) {
@@ -749,6 +816,18 @@ function loadAppData() {
 
   if (data.imageContainMode) displayImage.classList.add("contain-mode");
   else displayImage.classList.remove("contain-mode");
+
+  if (data.hasSubStopwatch) {
+    hasSubStopwatch = true;
+    createSubStopwatch();
+    toggleSubStopwatchBtn.innerText = "보조 스톱워치 삭제";
+  }
+
+  if (data.hasSubTimer) {
+    hasSubTimer = true;
+    createSubTimer();
+    toggleSubTimerBtn.innerText = "보조 타이머 삭제";
+  }
 }
 
 function bindRecordEvents() {
@@ -818,3 +897,379 @@ function filterExistingImages(urls) {
     })
   ).then(results => results.filter(Boolean));
 }
+
+// ==========================================
+// 12. 좌우 패널 접기
+// ==========================================
+const PANEL_STATE_KEY = "workTimerPanelState";
+
+function savePanelState() {
+  const state = {
+    leftCollapsed: leftPanel.classList.contains("is-collapsed"),
+    rightCollapsed: rightPanel.classList.contains("is-collapsed")
+  };
+
+  localStorage.setItem(PANEL_STATE_KEY, JSON.stringify(state));
+}
+
+function loadPanelState() {
+  const saved = localStorage.getItem(PANEL_STATE_KEY);
+  if (!saved) return;
+
+  const state = JSON.parse(saved);
+
+  leftPanel.classList.toggle("is-collapsed", !!state.leftCollapsed);
+  rightPanel.classList.toggle("is-collapsed", !!state.rightCollapsed);
+}
+
+leftPanelToggle.onclick = () => {
+  leftPanel.classList.toggle("is-collapsed");
+  savePanelState();
+};
+
+rightPanelToggle.onclick = () => {
+  rightPanel.classList.toggle("is-collapsed");
+  savePanelState();
+};
+
+window.addEventListener("load", loadPanelState);
+
+// ==========================================
+// 13. 앱 메뉴 & 초기화
+// ==========================================
+openAppMenuBtn.onclick = () => {
+  appMenuPanel.style.display = "flex";
+};
+
+appMenuPanel.onclick = (e) => {
+  if (e.target === appMenuPanel) {
+    appMenuPanel.style.display = "none";
+  }
+};
+
+resetAppBtn.onclick = () => {
+  const ok = confirm("초기화할까요?");
+
+  if (!ok) return;
+
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(PANEL_STATE_KEY);
+
+  location.reload();
+};
+
+// ==========================================
+// 14. 메모 색상 변경
+// ==========================================
+document.querySelectorAll(".memo-color-btn").forEach((btn) => {
+  btn.onclick = () => {
+    editingMemoColorIndex = parseInt(btn.dataset.index, 10);
+
+    memoHexEditor.style.display = "block";
+    memoHexInput.value = memoColorSlots[editingMemoColorIndex];
+    memoHexInput.focus();
+    memoHexInput.select();
+  };
+});
+
+memoHexInput.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+
+  const newColor = normalizeHex(memoHexInput.value);
+
+  if (!newColor || editingMemoColorIndex === null) {
+    memoHexInput.value = "";
+    memoHexInput.placeholder = "예: #aee7ff";
+    return;
+  }
+
+  replaceMemoColorSlot(editingMemoColorIndex, newColor);
+
+  editingMemoColorIndex = null;
+  memoHexEditor.style.display = "none";
+});
+
+// ==========================================
+// 15. 보조 스톱워치
+// ==========================================
+let hasSubStopwatch = false;
+let subSwTime = 0;
+let subSwTimer = null;
+let subSwStartTime = null;
+
+function createSubStopwatch() {
+  subStopwatchContainer.innerHTML = `
+    <div class="box" id="subStopwatchBox">
+      <div class="box-header">
+        <h2>SUB_STOPWATCH</h2>
+        <button id="sub_sw_toggle" type="button" class="toggle-icon-btn" aria-label="보조 스톱워치 접기/펼치기"></button>
+      </div>
+
+      <div id="sub_sw_content">
+        <h1 id="sub_sw_display">00:00</h1>
+        <div class="button-row">
+          <button id="sub_sw_start">START</button>
+          <button id="sub_sw_stop" style="display:none;">Pause</button>
+          <button id="sub_sw_record" style="display:none;">Record</button>
+          <button id="sub_sw_reset" style="display:none;">Reset</button>
+          <button id="sub_sw_resume" style="display:none;">Continue</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  subSwTime = 0;
+  subSwTimer = null;
+  subSwStartTime = null;
+
+  sub_sw_start.onclick = () => {
+    if (subSwTimer) return;
+
+    subSwStartTime = new Date();
+
+    subSwTimer = setInterval(() => {
+      subSwTime++;
+      sub_sw_display.innerText = formatStopwatchDisplay(subSwTime);
+    }, 1000);
+
+    sub_sw_start.style.display = "none";
+    sub_sw_stop.style.display = "inline";
+  };
+
+  sub_sw_stop.onclick = () => {
+    clearInterval(subSwTimer);
+    subSwTimer = null;
+
+    sub_sw_stop.style.display = "none";
+    sub_sw_record.style.display = "inline";
+    sub_sw_reset.style.display = "inline";
+    sub_sw_resume.style.display = "inline";
+  };
+
+  sub_sw_resume.onclick = () => {
+    if (subSwTimer) return;
+
+    subSwTimer = setInterval(() => {
+      subSwTime++;
+      sub_sw_display.innerText = formatStopwatchDisplay(subSwTime);
+    }, 1000);
+
+    sub_sw_stop.style.display = "inline";
+    sub_sw_record.style.display = "none";
+    sub_sw_reset.style.display = "none";
+    sub_sw_resume.style.display = "none";
+  };
+
+  sub_sw_reset.onclick = () => {
+    clearInterval(subSwTimer);
+    subSwTimer = null;
+    subSwTime = 0;
+    sub_sw_display.innerText = "00:00";
+
+    sub_sw_start.style.display = "inline";
+    sub_sw_stop.style.display = "none";
+    sub_sw_record.style.display = "none";
+    sub_sw_reset.style.display = "none";
+    sub_sw_resume.style.display = "none";
+  };
+
+  sub_sw_record.onclick = () => {
+    createRecord("SUB_STOPWATCH", formatRecordTime(subSwTime), "", subSwStartTime);
+  };
+
+  sub_sw_toggle.onclick = () => {
+    const isHidden = sub_sw_content.style.display === "none";
+    sub_sw_content.style.display = isHidden ? "block" : "none";
+    sub_sw_toggle.classList.toggle("is-collapsed", !isHidden);
+  };
+}
+
+function removeSubStopwatch() {
+  clearInterval(subSwTimer);
+  subSwTimer = null;
+  subSwTime = 0;
+  subStopwatchContainer.innerHTML = "";
+}
+
+toggleSubStopwatchBtn.onclick = () => {
+  hasSubStopwatch = !hasSubStopwatch;
+
+  if (hasSubStopwatch) {
+    createSubStopwatch();
+    toggleSubStopwatchBtn.innerText = "보조 스톱워치 삭제";
+  } else {
+    removeSubStopwatch();
+    toggleSubStopwatchBtn.innerText = "보조 스톱워치 추가";
+  }
+
+  saveAppData();
+};
+
+// ==========================================
+// 16. 보조 타이머
+// ==========================================
+let hasSubTimer = false;
+let subTTime = 0;
+let subTRemain = 0;
+let subTTimer = null;
+let subTStartTime = null;
+
+function createSubTimer() {
+  subTimerContainer.innerHTML = `
+    <div class="box" id="subTimerBox">
+      <div class="box-header">
+        <h2>SUB_TIMER</h2>
+        <button id="sub_t_toggle" type="button" class="toggle-icon-btn" aria-label="보조 타이머 접기/펼치기"></button>
+      </div>
+
+      <div id="sub_t_content">
+        <div id="sub_t_inputBox">
+          <span class="time-part" contenteditable="true" id="sub_t_h">00</span>
+          <span class="colon">:</span>
+          <span class="time-part" contenteditable="true" id="sub_t_m">00</span>
+          <span class="colon">:</span>
+          <span class="time-part" contenteditable="true" id="sub_t_s">00</span>
+        </div>
+
+        <h1 id="sub_t_display">00:00</h1>
+
+        <div class="button-row">
+          <button id="sub_t_start">START</button>
+          <button id="sub_t_stop" style="display:none;">Pause</button>
+          <button id="sub_t_record" style="display:none;">Record</button>
+          <button id="sub_t_reset" style="display:none;">Reset</button>
+          <button id="sub_t_resume" style="display:none;">Continue</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  function getSubTimerSeconds() {
+    const h = parseInt(sub_t_h.innerText, 10) || 0;
+    const m = parseInt(sub_t_m.innerText, 10) || 0;
+    const s = parseInt(sub_t_s.innerText, 10) || 0;
+    return h * 3600 + m * 60 + s;
+  }
+
+  sub_t_start.onclick = () => {
+    if (subTTimer) return;
+
+    subTTime = getSubTimerSeconds();
+    if (subTTime <= 0) return;
+
+    subTRemain = subTTime;
+    subTStartTime = new Date();
+
+    sub_t_inputBox.style.display = "none";
+    sub_t_display.innerText = formatDisplay(subTRemain);
+
+    subTTimer = setInterval(() => {
+      subTRemain--;
+      sub_t_display.innerText = formatDisplay(subTRemain);
+
+      if (subTRemain <= 0) {
+        clearInterval(subTTimer);
+        subTTimer = null;
+        subTRemain = 0;
+        sub_t_display.innerText = formatDisplay(subTRemain);
+
+        alarmSound.currentTime = 0;
+        alarmSound.play().catch(() => {});
+        alert("종료");
+      }
+    }, 1000);
+
+    sub_t_start.style.display = "none";
+    sub_t_stop.style.display = "inline";
+  };
+
+  sub_t_stop.onclick = () => {
+    clearInterval(subTTimer);
+    subTTimer = null;
+
+    sub_t_start.style.display = "none";
+    sub_t_stop.style.display = "none";
+    sub_t_record.style.display = "inline";
+    sub_t_reset.style.display = "inline";
+    sub_t_resume.style.display = "inline";
+  };
+
+  sub_t_resume.onclick = () => {
+    if (subTTimer || subTRemain <= 0) return;
+
+    subTTimer = setInterval(() => {
+      subTRemain--;
+      sub_t_display.innerText = formatDisplay(subTRemain);
+
+      if (subTRemain <= 0) {
+        clearInterval(subTTimer);
+        subTTimer = null;
+        subTRemain = 0;
+        sub_t_display.innerText = formatDisplay(subTRemain);
+
+        alarmSound.currentTime = 0;
+        alarmSound.play().catch(() => {});
+        alert("종료");
+      }
+    }, 1000);
+
+    sub_t_start.style.display = "none";
+    sub_t_stop.style.display = "inline";
+    sub_t_record.style.display = "none";
+    sub_t_reset.style.display = "none";
+    sub_t_resume.style.display = "none";
+  };
+
+  sub_t_reset.onclick = () => {
+    clearInterval(subTTimer);
+    subTTimer = null;
+    subTTime = 0;
+    subTRemain = 0;
+    sub_t_display.innerText = "00:00";
+
+    sub_t_inputBox.style.display = "block";
+    sub_t_h.innerText = "00";
+    sub_t_m.innerText = "00";
+    sub_t_s.innerText = "00";
+
+    sub_t_start.style.display = "inline";
+    sub_t_stop.style.display = "none";
+    sub_t_record.style.display = "none";
+    sub_t_reset.style.display = "none";
+    sub_t_resume.style.display = "none";
+  };
+
+  sub_t_record.onclick = () => {
+    createRecord("SUB_TIMER", formatRecordTime(subTRemain), formatRecordSubTime(subTTime), subTStartTime);
+  };
+
+  sub_t_toggle.onclick = () => {
+    const isHidden = sub_t_content.style.display === "none";
+    sub_t_content.style.display = isHidden ? "block" : "none";
+    sub_t_toggle.classList.toggle("is-collapsed", !isHidden);
+  };
+
+  setupTimeInput(sub_t_h, null);
+  setupTimeInput(sub_t_m, 60);
+  setupTimeInput(sub_t_s, 60);
+}
+
+function removeSubTimer() {
+  clearInterval(subTTimer);
+  subTTimer = null;
+  subTimerContainer.innerHTML = "";
+}
+
+toggleSubTimerBtn.onclick = () => {
+  hasSubTimer = !hasSubTimer;
+
+  if (hasSubTimer) {
+    createSubTimer();
+    toggleSubTimerBtn.innerText = "보조 타이머 삭제";
+  } else {
+    removeSubTimer();
+    toggleSubTimerBtn.innerText = "보조 타이머 추가";
+  }
+
+  saveAppData();
+};
