@@ -598,3 +598,288 @@ button {
 .toggle-icon-btn.is-collapsed { transform: translateY(-50%) rotate(180deg); }
 
 .right-group { display: flex; gap: 0px; align-items: center; }
+
+/* =========================
+   9. 좌우 패널 접기
+========================= */
+
+.container {
+  position: relative;
+}
+
+.left, .right {
+  position: fixed;
+  top: 0;
+  height: 100vh;
+  width: 25%;
+  z-index: 50;
+  transition: transform 0.25s ease;
+}
+
+.left {
+  left: 0;
+}
+
+.right {
+  right: 0;
+}
+
+.center {
+  width: 50%;
+  margin: 0 auto;
+}
+
+/* 접힌 상태 */
+.left.is-collapsed {
+  transform: translateX(calc(-100% + 14px));
+}
+
+.right.is-collapsed {
+  transform: translateX(calc(100% - 14px));
+}
+
+/* 토글 버튼 */
+.side-panel-toggle {
+  position: absolute;
+  top: 0;
+  width: 14px;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: rgba(0, 0, 0, 0.03);
+  opacity: 0;
+  transition: opacity 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+  z-index: 999;
+}
+
+.left:hover .side-panel-toggle,
+.right:hover .side-panel-toggle {
+  opacity: 1;
+}
+
+.side-panel-toggle:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.left-toggle {
+  right: 0;
+}
+
+.right-toggle {
+  left: 0;
+}
+
+/* =========================
+   10. 스크롤바 숨김
+========================= */
+
+/* 기본: 스크롤은 되는데 안 보이게 */
+.center {
+  scrollbar-width: none;        /* 파이어폭스 */
+  -ms-overflow-style: none;     /* 익스플로러 */
+}
+
+.center::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.left, .right {
+  scrollbar-width: none;
+}
+
+.left::-webkit-scrollbar,
+.right::-webkit-scrollbar {
+  width: 0;
+}
+
+/* =========================
+   11. 작은 화면 대응
+========================= */
+
+@media (max-width: 900px) {
+  .left,
+  .right {
+    width: 260px;
+  }
+
+  .center {
+    width: 100%;
+    margin: 0 auto;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  .left:not(.is-collapsed) {
+    transform: translateX(calc(-100% + 14px));
+  }
+
+  .right:not(.is-collapsed) {
+    transform: translateX(calc(100% - 14px));
+  }
+}
+
+.side-panel-toggle {
+  font-size: 0;
+  color: transparent;
+  overflow: hidden;
+  text-indent: -9999px;
+}
+
+/* =========================
+   12. 중앙 하단 메뉴
+========================= */
+
+.app-menu-btn {
+  width: 40px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 16px auto 0;
+
+  background: transparent;
+  border: none;
+  color: #777;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+#appMenuPanel {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+
+.app-menu-box {
+  width: 220px;
+  padding: 24px;
+  background: transparent;
+  border-radius: 12px;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+#resetAppBtn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  color: #333;
+  padding: 10px 14px;
+  border: 1px solid #333;
+  background: #fff;
+}
+
+#resetAppBtn:hover {
+  background: #ddd;
+}
+
+/*보조 타이머 추가*/
+.app-menu-action-btn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 12px 0 0 0;
+  padding: 10px 14px;
+  border: 1px solid #333;
+  background: #fff;
+  color: #333;
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.app-menu-action-btn:hover {
+  background: #ddd;
+}
+
+/* =========================
+   13. 메모 색상 선택
+========================= */
+
+.memo-color-menu {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 16px 0 0 0;
+  padding: 14px;
+  border: 1px solid #333;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.memo-color-title {
+  font-size: 13px;
+  color: #333;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* 컬러칩 영역 */
+.memo-color-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* 컬러칩 */
+.memo-color-btn {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #333;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* 색상 */
+.memo-color-btn[data-index="0"] {
+  background: #ffffff;
+}
+
+.memo-color-btn[data-index="1"] {
+  background: #ffebeb;
+}
+
+.memo-color-btn[data-index="2"] {
+  background: #e4f7d9;
+}
+
+/* hover */
+.memo-color-btn:hover {
+  transform: scale(1.1);
+}
+
+.memo-hex-editor {
+  margin-top: 12px;
+}
+
+#memoHexInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  outline: none;
+  text-align: center;
+  background: #fff;
+}
+
+/* =========================
+   14. 서브타이머
+========================= */
+#subStopwatchBox h2 {
+  font-size: 16px;
+}
+
+#subTimerBox h2 {
+  font-size: 16px;
+}
