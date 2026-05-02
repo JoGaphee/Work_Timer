@@ -12,7 +12,9 @@
 
   <div class="container">
 
-    <div class="left">
+    <div class="left" id="leftPanel">
+      <button id="leftPanelToggle" class="side-panel-toggle left-toggle" type="button" aria-label="기록 영역 접기"></button>
+
       <div class="side-header">
         <h3>RECORD</h3>
         <div class="side-buttons">
@@ -95,6 +97,8 @@
         </div>
       </div>
 
+      <div id="subStopwatchContainer"></div>
+
       <div class="box">
         <div class="box-header">
           <h2>TIMER</h2>
@@ -119,9 +123,44 @@
         </div>
       </div>
 
+      <div id="subTimerContainer"></div>
+
+      <button id="openAppMenuBtn" type="button" class="app-menu-btn" aria-label="앱 메뉴 열기">⋯</button>
+
+        <div id="appMenuPanel">
+         <div class="app-menu-box">
+           <button id="resetAppBtn" type="button">초기화</button>
+
+           <div class="memo-color-menu">
+             <div class="memo-color-title">메모 색상</div>
+
+             <div class="memo-color-buttons">
+              <button type="button" class="memo-color-btn" data-index="0" aria-label="메모 색상 1"></button>
+              <button type="button" class="memo-color-btn" data-index="1" aria-label="메모 색상 2"></button>
+              <button type="button" class="memo-color-btn" data-index="2" aria-label="메모 색상 3"></button>
+             </div>
+
+             <div id="memoHexEditor" class="memo-hex-editor" style="display:none;">
+               <input type="text" id="memoHexInput" placeholder="#ffffff" maxlength="7">
+            </div>
+          </div>
+
+            <button id="toggleSubStopwatchBtn" type="button" class="app-menu-action-btn">
+              보조 스톱워치 추가
+            </button>
+
+            <button id="toggleSubTimerBtn" type="button" class="app-menu-action-btn">
+              보조 타이머 추가
+            </button>
+
+        </div>
+      </div>
+
     </div>
 
-    <div class="right">
+    <div class="right" id="rightPanel">
+      <button id="rightPanelToggle" class="side-panel-toggle right-toggle" type="button" aria-label="메모 영역 접기"></button>
+
       <div class="side-header">
         <h3>MEMO</h3>
         <div class="side-buttons">
