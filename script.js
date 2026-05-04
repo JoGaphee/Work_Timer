@@ -915,6 +915,7 @@ function savePanelState() {
 function loadPanelState() {
   const saved = localStorage.getItem(PANEL_STATE_KEY);
   if (!saved) return;
+  updatePanelOpenClasses();
 
   const state = JSON.parse(saved);
 
@@ -925,14 +926,22 @@ function loadPanelState() {
 leftPanelToggle.onclick = () => {
   leftPanel.classList.toggle("is-collapsed");
   savePanelState();
+  updatePanelOpenClasses();
 };
 
 rightPanelToggle.onclick = () => {
   rightPanel.classList.toggle("is-collapsed");
   savePanelState();
+  updatePanelOpenClasses();
 };
 
 window.addEventListener("load", loadPanelState);
+
+
+function updatePanelOpenClasses() {
+  document.body.classList.toggle("left-panel-open", !leftPanel.classList.contains("is-collapsed"));
+  document.body.classList.toggle("right-panel-open", !rightPanel.classList.contains("is-collapsed"));
+}
 
 // ==========================================
 // 13. 앱 메뉴 & 초기화
