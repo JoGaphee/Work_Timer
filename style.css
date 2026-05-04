@@ -893,3 +893,53 @@ button {
 #subTimerBox h2 {
   font-size: 16px;
 }
+
+/* =========================
+   15. 브라우저 크기조절 대응
+========================= */
+
+/* 1. 컨테이너: 필요할 때만 가로 스크롤 허용 */
+.container {
+  display: flex !important;
+  justify-content: flex-start !important;
+  overflow-x: auto !important;
+  min-width: 0 !important; 
+  width: 100% !important;
+}
+
+/* 2. 패널: 고정(absolute) 해제, 자연스럽게 열리면서 중앙을 밀어내게 함 */
+.left, .right {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  flex-shrink: 0 !important;
+  width: 260px !important;
+  height: 100vh !important;
+  transition: width 0.25s ease, padding 0.25s ease !important;
+  overflow-x: hidden !important;
+}
+
+/* 3. 중앙 영역: 창을 줄여도 찌그러지지 않게 안전 너비(400px)로 */
+.center {
+  flex-shrink: 0 !important;
+  width: 400px !important;
+  margin: 0 auto !important;
+}
+
+/* 4. 접힐 때 토글 버튼 크기(14px)만 남기고 줄어듦 */
+.left.is-collapsed, .right.is-collapsed {
+  width: 14px !important; 
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  transform: none !important;
+}
+
+/* 5. 접힐 때 폰트/아이콘 찌꺼기 깔끔하게 숨김 */
+.left.is-collapsed > *:not(.side-panel-toggle),
+.right.is-collapsed > *:not(.side-panel-toggle) {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 0.1s ease !important;
+}
