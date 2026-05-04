@@ -713,12 +713,22 @@ button {
     padding-right: 24px;
   }
 
-  .left:not(.is-collapsed) {
-    transform: translateX(calc(-100% + 14px));
+  body.left-panel-open .center {
+    width: calc(100% - 260px);
+    margin-left: 260px;
+    margin-right: 0;
   }
 
-  .right:not(.is-collapsed) {
-    transform: translateX(calc(100% - 14px));
+  body.right-panel-open .center {
+    width: calc(100% - 260px);
+    margin-left: 0;
+    margin-right: 260px;
+  }
+
+  body.left-panel-open.right-panel-open .center {
+    width: calc(100% - 520px);
+    margin-left: 260px;
+    margin-right: 260px;
   }
 }
 
