@@ -44,3 +44,4 @@ https://jogaphee.github.io/Work_Timer/
 - 브라우저 크기 대응 UI 레이아웃 조정
 - 이미지 저장 오류 수정
 - 스톱워치 시간 표시 수정
+ 
