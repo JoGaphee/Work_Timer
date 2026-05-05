@@ -86,7 +86,8 @@ popupImageInput.onchange = async (e) => {
   if (files.length === 0) return;
 
   for (const file of files) {
-    const dataUrl = await fileToDataUrl(file);
+    // 기존의 await fileToDataUrl(file); 대신 아래 코드로 변경!
+    const dataUrl = await compressImage(file);
     draftImages.push({ name: file.name, url: dataUrl });
   }
 
@@ -261,7 +262,7 @@ sw_reset.onclick = () => {
   clearInterval(swTimer);
   swTimer = null;
   swTime = 0;
-  sw_display.innerText = "00:00";
+  sw_display.innerText = "00:00:00";
 
   sw_start.style.display = "inline";
   sw_stop.style.display = "none";
@@ -631,9 +632,10 @@ function formatDisplay(t) {
 }
 
 function formatStopwatchDisplay(t) {
-  const m = Math.floor(t / 60);
+  const h = Math.floor(t / 3600);
+  const m = Math.floor((t % 3600) / 60);
   const s = t % 60;
-  return `${pad(m)}:${pad(s)}`;
+  return `${pad(h)}:${pad(m)}:${pad(s)}`; 
 }
 
 function formatRecordTime(t) {
@@ -749,6 +751,40 @@ t_toggle.onclick = () => {
   t_content.style.display = isHidden ? "block" : "none";
   t_toggle.classList.toggle("is-collapsed", !isHidden);
 };
+
+// 이미지 압축 함수
+function compressImage(file, maxSize = 800) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxSize || height > maxSize) {
+          if (width > height) {
+            height = Math.round((height * maxSize) / width);
+            width = maxSize;
+          } else {
+            width = Math.round((width * maxSize) / height);
+            height = maxSize;
+          }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        // 용량을 확 줄이기 위해 jpeg 70% 화질로 압축
+        resolve(canvas.toDataURL("image/jpeg", 0.7)); 
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
 
 // ==========================================
 // 11. 로컬 데이터 관리 & 기본 이미지 적용
@@ -1015,7 +1051,7 @@ function createSubStopwatch() {
       </div>
 
       <div id="sub_sw_content">
-        <h1 id="sub_sw_display">00:00</h1>
+        <h1 id="sub_sw_display">00:00:00</h1>
         <div class="button-row">
           <button id="sub_sw_start">START</button>
           <button id="sub_sw_stop" style="display:none;">Pause</button>
@@ -1073,7 +1109,7 @@ function createSubStopwatch() {
     clearInterval(subSwTimer);
     subSwTimer = null;
     subSwTime = 0;
-    sub_sw_display.innerText = "00:00";
+    sub_sw_display.innerText = "00:00:00";
 
     sub_sw_start.style.display = "inline";
     sub_sw_stop.style.display = "none";
