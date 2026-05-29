@@ -755,6 +755,13 @@ t_toggle.onclick = () => {
 // 이미지 압축 함수
 function compressImage(file, maxSize = 800) {
   return new Promise((resolve) => {
+    if (file.type === "image/gif") {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target.result);
+      reader.readAsDataURL(file);
+      return; 
+    }
+    
     const reader = new FileReader();
     reader.onload = (e) => {
       const img = new Image();
