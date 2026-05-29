@@ -611,7 +611,7 @@ button {
   position: fixed;
   top: 0;
   height: 100vh;
-  width: 25%;
+  width: 28%;
   z-index: 50;
   transition: transform 0.25s ease;
 }
@@ -699,11 +699,10 @@ button {
 /* =========================
    11. 작은 화면 대응
 ========================= */
-
 @media (max-width: 900px) {
   .left,
   .right {
-    width: 260px;
+    width: 300px; /* 💡 기존 260px -> 300px로 넓힘 */
   }
 
   .center {
@@ -714,29 +713,22 @@ button {
   }
 
   body.left-panel-open .center {
-    width: calc(100% - 260px);
-    margin-left: 260px;
+    width: calc(100% - 300px); /* 💡 260 -> 300 */
+    margin-left: 300px; /* 💡 260 -> 300 */
     margin-right: 0;
   }
 
   body.right-panel-open .center {
-    width: calc(100% - 260px);
+    width: calc(100% - 300px); /* 💡 260 -> 300 */
     margin-left: 0;
-    margin-right: 260px;
+    margin-right: 300px; /* 💡 260 -> 300 */
   }
 
   body.left-panel-open.right-panel-open .center {
-    width: calc(100% - 520px);
-    margin-left: 260px;
-    margin-right: 260px;
+    width: calc(100% - 600px); /* 💡 양쪽 열림: 520 -> 600 (300+300) */
+    margin-left: 300px; /* 💡 260 -> 300 */
+    margin-right: 300px; /* 💡 260 -> 300 */
   }
-}
-
-.side-panel-toggle {
-  font-size: 0;
-  color: transparent;
-  overflow: hidden;
-  text-indent: -9999px;
 }
 
 /* =========================
